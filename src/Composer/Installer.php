@@ -1,14 +1,5 @@
 <?php
 
-/**
- * PHP version 8
- *
- * @author      Webjump Core Team <dev@webjump.com.br>
- * @copyright   2023 Webjump (https://www.webjump.com.br)
- * @license     https://www.webjump.com.br Copyright
- * @link        https://www.webjump.com.br
- */
-
 declare(strict_types=1);
 
 namespace FilipeMglhs\MagentoDevelopmentInstallerPlugin\Composer;

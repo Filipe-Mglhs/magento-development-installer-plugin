@@ -1,14 +1,5 @@
 <?php
 
-/**
- * PHP version 8
- *
- * @author      Webjump Core Team <dev@webjump.com.br>
- * @copyright   2023 Webjump (https://www.webjump.com.br)
- * @license     https://www.webjump.com.br Copyright
- * @link        https://www.webjump.com.br
- */
-
 declare(strict_types=1);
 
 namespace FilipeMglhs\MagentoDevelopmentInstallerPlugin\Composer;
@@ -23,21 +14,13 @@ use Composer\Plugin\PluginInterface;
 class Plugin implements PluginInterface
 {
     /**
-     * Plugin constructor.
-     *
-     * @param Installer $installer
-     */
-    public function __construct(
-        private readonly Installer $installer
-    ) {
-    }
-
-    /**
      * @inheritDoc
      */
     public function activate(Composer $composer, IOInterface $io)
     {
-        $composer->getInstallationManager()->addInstaller($this->installer);
+        $installer = new Installer($io, $composer);
+        $composer->getInstallationManager()
+            ->addInstaller($installer);
     }
 
     /**
@@ -45,7 +28,9 @@ class Plugin implements PluginInterface
      */
     public function deactivate(Composer $composer, IOInterface $io)
     {
-        $composer->getInstallationManager()->removeInstaller($this->installer);
+        $installer = new Installer($io, $composer);
+        $composer->getInstallationManager()
+            ->removeInstaller($installer);
     }
 
     /**
