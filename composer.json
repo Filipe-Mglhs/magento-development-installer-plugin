@@ -1,5 +1,5 @@
 {
-    "name": "filipemglhs/magento-development-installer-plugin",
+    "name": "filipe-mglhs/magento-development-installer-plugin",
     "description": "Composer Custom Installer for Magento 2",
     "type": "composer-plugin",
     "minimum-stability": "stable",
