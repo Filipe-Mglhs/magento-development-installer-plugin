@@ -30,20 +30,19 @@ class Installer extends LibraryInstaller
     }
 
     /**
-     * Method Description
+     * Development package path builder
      *
      * @param PackageInterface $package
      *
-     * @return string
+     * @return string|null
      */
-    public function pathBuilder(PackageInterface $package): string
+    public function pathBuilder(PackageInterface $package): ?string
     {
         $registration = $this->getRegistration($package);
         if (!$registration) {
-            $this->getInstallPath($package);
+            return null;
         }
 
-        $path = $this->getInstallPath($package);
         switch ($package->getType()) {
             case 'magento2-module':
                 $path = "app/code/" . str_replace('_', '/', $registration);
@@ -55,6 +54,9 @@ class Installer extends LibraryInstaller
                 $parts = explode('_', $registration);
                 $vendor = array_shift($parts);
                 $path = "app/i18n/" . $vendor . "/" . implode('_', $parts);
+                break;
+            default:
+                $path = null;
                 break;
         }
 
@@ -81,7 +83,7 @@ class Installer extends LibraryInstaller
      */
     public function getInstallPath(PackageInterface $package): string
     {
-        return $this->pathBuilder($package);
+        return $this->pathBuilder($package) ?: parent::getInstallPath($package);
     }
 
     /**
