@@ -6,6 +6,7 @@ namespace FilipeMglhs\MagentoDevelopmentInstallerPlugin\Composer;
 
 use Composer\Installer\LibraryInstaller;
 use Composer\Package\PackageInterface;
+use React\Promise\PromiseInterface;
 
 /**
  * Class Installer
@@ -20,14 +21,12 @@ class Installer extends LibraryInstaller
      *
      * @param PackageInterface $package
      *
-     * @return bool
+     * @return string|null
      */
-    public function isDevelopment(PackageInterface $package): bool
+    public function getRegistration(PackageInterface $package): ?string
     {
-        $targetList = $this->composer->getPackage()
-                ->getExtra()[self::CONFIG_IDENTIFIER] ?? [];
-
-        return in_array($package->getName(), $targetList);
+        $extra = $this->composer->getPackage()->getExtra();
+        return $extra[self::CONFIG_IDENTIFIER][$package->getName()] ?? null;
     }
 
     /**
@@ -37,12 +36,29 @@ class Installer extends LibraryInstaller
      *
      * @return string
      */
-    public function buildPath(PackageInterface $package): string
+    public function pathBuilder(PackageInterface $package): string
     {
-        $autoload = $package->getAutoload()['psr-4'][0] ?? false;
-        return $autoload
-            ? str_replace('\\', '/', $autoload)
-            : $this->getInstallPath($package) ;
+        $registration = $this->getRegistration($package);
+        if (!$registration) {
+            $this->getInstallPath($package);
+        }
+
+        $path = $this->getInstallPath($package);
+        switch ($package->getType()) {
+            case 'magento2-module':
+                $path = "app/code/" . str_replace('_', '/', $registration);
+                break;
+            case 'magento2-theme':
+                $path = "app/design/" . $registration;
+                break;
+            case 'magento2-language':
+                $parts = explode('_', $registration);
+                $vendor = array_shift($parts);
+                $path = "app/i18n/" . $vendor . "/" . implode('_', $parts);
+                break;
+        }
+
+        return $path;
     }
 
     /**
@@ -52,8 +68,8 @@ class Installer extends LibraryInstaller
         $type,
         PackageInterface $package,
         PackageInterface $prevPackage = null
-    ) {
-        if ($this->isDevelopment($package)) {
+    ): ?PromiseInterface {
+        if ($this->getRegistration($package)) {
             $package->setInstallationSource('source');
         }
 
@@ -63,18 +79,23 @@ class Installer extends LibraryInstaller
     /**
      * @inheritDoc
      */
-    public function getInstallPath(PackageInterface $package)
+    public function getInstallPath(PackageInterface $package): string
     {
-        return $this->isDevelopment($package)
-            ? $this->buildPath($package)
-            : parent::getInstallPath($package);
+        return $this->pathBuilder($package);
     }
 
     /**
      * @inheritDoc
      */
-    public function supports($packageType)
+    public function supports($packageType): bool
     {
-        return $packageType === 'magento2-module';
+        return in_array(
+            $packageType,
+            [
+                'magento2-module',
+                'magento2-theme',
+                'magento2-language'
+            ]
+        );
     }
 }
