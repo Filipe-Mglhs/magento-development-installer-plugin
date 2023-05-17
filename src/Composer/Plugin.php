@@ -18,19 +18,9 @@ class Plugin implements PluginInterface
      */
     public function activate(Composer $composer, IOInterface $io)
     {
-        if (
-            in_array(
-                $composer->getPackage()->getName(),
-                [
-                    'magento/project-enterprise-edition',
-                    'magento/project-community-edition'
-                ]
-            )
-        ) {
-            $installer = new Installer($io, $composer);
-            $composer->getInstallationManager()
-                ->addInstaller($installer);
-        }
+        $installer = new Installer($io, $composer);
+        $composer->getInstallationManager()
+            ->addInstaller($installer);
     }
 
     /**
