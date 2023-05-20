@@ -13,9 +13,6 @@ use React\Promise\PromiseInterface;
  */
 class Installer extends LibraryInstaller
 {
-    /** Extra Configuration ID */
-    public const CONFIG_IDENTIFIER = 'development-components';
-
     /**
      * Verify if package is in extra development-components configuration
      *
@@ -26,7 +23,7 @@ class Installer extends LibraryInstaller
     public function getRegistration(PackageInterface $package): ?string
     {
         $extra = $this->composer->getPackage()->getExtra();
-        return $extra[self::CONFIG_IDENTIFIER][$package->getName()] ?? null;
+        return $extra['development-components'][$package->getName()] ?? null;
     }
 
     /**
@@ -58,6 +55,10 @@ class Installer extends LibraryInstaller
             default:
                 $path = null;
                 break;
+        }
+
+        if ($path && !$this->filesystem->isAbsolutePath($path)) {
+            $path = getcwd() . '/' . $path;
         }
 
         return $path;
