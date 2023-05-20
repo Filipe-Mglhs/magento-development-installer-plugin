@@ -67,21 +67,6 @@ class Installer extends LibraryInstaller
     /**
      * @inheritDoc
      */
-    public function prepare(
-        $type,
-        PackageInterface $package,
-        PackageInterface $prevPackage = null
-    ): ?PromiseInterface {
-        if ($this->getRegistration($package)) {
-            $package->setInstallationSource('source');
-        }
-
-        return parent::prepare($type, $package, $prevPackage);
-    }
-
-    /**
-     * @inheritDoc
-     */
     public function getInstallPath(PackageInterface $package): string
     {
         return $this->pathBuilder($package) ?: parent::getInstallPath($package);
